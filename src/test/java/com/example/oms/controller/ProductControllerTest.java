@@ -5,36 +5,67 @@ import com.example.oms.service.ProductService;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class ProductControllerTest {
 
-    private final ProductService service = mock(ProductService.class);
+    private static class StubProductService extends ProductService {
+        private ProductDto lastCreated;
+        private ProductDto fixed;
+        private List<ProductDto> list = new ArrayList<ProductDto>();
+
+        StubProductService(ProductDto fixed) {
+            super(null);
+            this.fixed = fixed;
+            list.add(fixed);
+        }
+
+        @Override
+        public ProductDto create(ProductDto dto) {
+            this.lastCreated = dto;
+            return fixed;
+        }
+
+        @Override
+        public ProductDto get(Long id) {
+            return fixed;
+        }
+
+        @Override
+        public List<ProductDto> list() {
+            return list;
+        }
+
+        @Override
+        public ProductDto update(Long id, ProductDto dto) {
+            return fixed;
+        }
+
+        @Override
+        public ProductDto discontinue(Long id) {
+            return fixed;
+        }
+    }
+
+    private final ProductDto dto = new ProductDto();
+    private final ProductService service = new StubProductService(dto);
     private final ProductController controller = new ProductController(service);
 
     @Test
     void endpoints() {
-        ProductDto dto = new ProductDto();
-        when(service.create(any(ProductDto.class))).thenReturn(dto);
         ResponseEntity<ProductDto> created = controller.create(dto);
         assertEquals(201, created.getStatusCodeValue());
 
-        when(service.get(1L)).thenReturn(dto);
         assertNotNull(controller.get(1L));
 
-        when(service.list()).thenReturn(Collections.singletonList(dto));
         assertEquals(1, controller.list().size());
 
-        when(service.update(eq(1L), any(ProductDto.class))).thenReturn(dto);
         assertNotNull(controller.update(1L, dto));
 
-        when(service.discontinue(1L)).thenReturn(dto);
         assertNotNull(controller.discontinue(1L));
     }
 }

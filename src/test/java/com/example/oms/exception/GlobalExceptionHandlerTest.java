@@ -3,7 +3,8 @@ package com.example.oms.exception;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.support.SimpleBindingResult;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.FieldError;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -35,8 +36,11 @@ class GlobalExceptionHandlerTest {
     void handleValidation() {
         HttpServletRequest req = mock(HttpServletRequest.class);
         when(req.getRequestURI()).thenReturn("/test");
-        MethodArgumentNotValidException ex = mock(MethodArgumentNotValidException.class);
-        when(ex.getBindingResult()).thenReturn(new SimpleBindingResult("t", "t"));
+        BeanPropertyBindingResult bindingResult =
+                new BeanPropertyBindingResult(new Object(), "t");
+        bindingResult.addError(new FieldError("t", "field", "must not be null"));
+        MethodArgumentNotValidException ex =
+                new MethodArgumentNotValidException(null, bindingResult);
         ResponseEntity<ApiError> resp = handler.handleValidation(ex, req);
         assertEquals(400, resp.getStatusCodeValue());
     }

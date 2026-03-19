@@ -1,6 +1,7 @@
 package com.example.oms.controller;
 
 import com.example.oms.dto.InventoryItemDto;
+import com.example.oms.dto.InventoryItemRecord;
 import com.example.oms.service.InventoryService;
 import org.junit.jupiter.api.Test;
 
@@ -25,8 +26,8 @@ class InventoryControllerTest {
         }
 
         @Override
-        public InventoryItemDto createOrUpdate(InventoryItemDto dto) {
-            return fixed;
+        public InventoryItemRecord createOrUpdate(InventoryItemRecord dto) {
+            return new InventoryItemRecord(fixed.getId(), fixed.getSku(), fixed.getQuantity(), fixed.getStatus());
         }
 
         @Override
@@ -49,10 +50,11 @@ class InventoryControllerTest {
     private final InventoryItemDto dto = new InventoryItemDto();
     private final InventoryService service = new StubInventoryService(dto);
     private final InventoryController controller = new InventoryController(service);
+    private final InventoryItemRecord record = new InventoryItemRecord(dto.getSku(), dto.getQuantity());
 
     @Test
     void endpoints() {
-        assertNotNull(controller.createOrUpdate(dto));
+        assertNotNull(controller.createOrUpdate(record));
 
         assertNotNull(controller.getBySku("SKU"));
 

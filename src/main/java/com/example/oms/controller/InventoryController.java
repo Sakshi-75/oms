@@ -1,6 +1,7 @@
 package com.example.oms.controller;
 
 import com.example.oms.dto.InventoryItemDto;
+import com.example.oms.dto.InventoryItemRecord;
 import com.example.oms.service.InventoryService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ public class InventoryController {
     }
 
     @PostMapping
-    public InventoryItemDto createOrUpdate(@Validated @RequestBody InventoryItemDto dto) {
+    public InventoryItemRecord createOrUpdate(@Validated @RequestBody InventoryItemRecord dto) {
         return inventoryService.createOrUpdate(dto);
     }
 

@@ -1,6 +1,7 @@
 package com.example.oms.service;
 
 import com.example.oms.dto.InventoryItemDto;
+import com.example.oms.dto.InventoryItemRecord;
 import com.example.oms.entity.InventoryItem;
 import com.example.oms.entity.InventoryStatus;
 import com.example.oms.exception.BusinessException;
@@ -21,21 +22,21 @@ public class InventoryService {
         this.inventoryItemRepository = inventoryItemRepository;
     }
 
-    public InventoryItemDto createOrUpdate(InventoryItemDto dto) {
-        InventoryItem existing = inventoryItemRepository.findBySku(dto.getSku()).orElse(null);
+    public InventoryItemRecord createOrUpdate(InventoryItemRecord dto) {
+        InventoryItem existing = inventoryItemRepository.findBySku(dto.sku()).orElse(null);
         if (existing == null) {
             InventoryItem entity = InventoryItemMapper.toEntity(dto);
             InventoryItem saved = inventoryItemRepository.save(entity);
-            return InventoryItemMapper.toDto(saved);
+            return InventoryItemMapper.toRecord(saved);
         } else {
-            existing.setQuantity(dto.getQuantity());
-            if (dto.getQuantity() <= 0) {
+            existing.setQuantity(dto.quantity());
+            if (dto.quantity() <= 0) {
                 existing.setStatus(InventoryStatus.OUT_OF_STOCK);
             } else {
                 existing.setStatus(InventoryStatus.AVAILABLE);
             }
             InventoryItem saved = inventoryItemRepository.save(existing);
-            return InventoryItemMapper.toDto(saved);
+            return InventoryItemMapper.toRecord(saved);
         }
     }
 

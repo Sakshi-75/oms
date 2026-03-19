@@ -1,6 +1,7 @@
 package com.example.oms.service;
 
 import com.example.oms.dto.InventoryItemDto;
+import com.example.oms.dto.InventoryItemRecord;
 import com.example.oms.entity.InventoryItem;
 import com.example.oms.entity.InventoryStatus;
 import com.example.oms.exception.BusinessException;
@@ -21,22 +22,22 @@ class InventoryServiceTest {
 
     @Test
     void createAndUpdateInventory() {
-        InventoryItemDto dto = new InventoryItemDto(null, "SKU", 5, null);
+        InventoryItemRecord dto = new InventoryItemRecord(null, "SKU", 5, null);
         when(repo.findBySku("SKU")).thenReturn(Optional.empty());
         when(repo.save(any(InventoryItem.class))).thenAnswer(i -> {
             InventoryItem item = i.getArgument(0);
             item.setId(1L);
             return item;
         });
-        InventoryItemDto created = service.createOrUpdate(dto);
-        assertNotNull(created.getId());
+        InventoryItemRecord created = service.createOrUpdate(dto);
+        assertNotNull(created.id());
 
         InventoryItem existing = new InventoryItem(1L, "SKU", 5, InventoryStatus.AVAILABLE);
         when(repo.findBySku("SKU")).thenReturn(Optional.of(existing));
         when(repo.save(any(InventoryItem.class))).thenAnswer(i -> i.getArgument(0));
-        InventoryItemDto updated = service.createOrUpdate(new InventoryItemDto(null, "SKU", 0, null));
-        assertEquals(0, updated.getQuantity());
-        assertEquals(InventoryStatus.OUT_OF_STOCK, updated.getStatus());
+        InventoryItemRecord updated = service.createOrUpdate(new InventoryItemRecord(null, "SKU", 0, null));
+        assertEquals(0, updated.quantity());
+        assertEquals(InventoryStatus.OUT_OF_STOCK, updated.status());
     }
 
     @Test

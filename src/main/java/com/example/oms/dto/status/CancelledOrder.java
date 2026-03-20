@@ -1,4 +1,4 @@
 package com.example.oms.dto.status;
 
-public final class CancelledOrder implements OrderStatus {
+public final record CancelledOrder() implements OrderStatus {
 }

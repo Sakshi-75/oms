@@ -9,6 +9,7 @@ import org.springframework.validation.FieldError;
 import javax.servlet.http.HttpServletRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -38,11 +39,13 @@ class GlobalExceptionHandlerTest {
         when(req.getRequestURI()).thenReturn("/test");
         BeanPropertyBindingResult bindingResult =
                 new BeanPropertyBindingResult(new Object(), "t");
-        bindingResult.addError(new FieldError("t", "field", "must not be null"));
+        bindingResult.addError(new FieldError("t", "field1", "must not be null"));
+        bindingResult.addError(new FieldError("t", "field2", "must be positive"));
         MethodArgumentNotValidException ex =
                 new MethodArgumentNotValidException(null, bindingResult);
         ResponseEntity<ApiError> resp = handler.handleValidation(ex, req);
         assertEquals(400, resp.getStatusCodeValue());
+        assertTrue(resp.getBody().getMessage().contains(";"));
     }
 
     @Test

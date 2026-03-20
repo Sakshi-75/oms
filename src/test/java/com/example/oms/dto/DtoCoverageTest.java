@@ -1,6 +1,10 @@
 package com.example.oms.dto;
 
+import com.example.oms.dto.status.CancelledOrder;
+import com.example.oms.dto.status.CompletedOrder;
 import com.example.oms.dto.status.NewOrder;
+import com.example.oms.dto.status.ProcessingOrder;
+import com.example.oms.exception.ApiError;
 import com.example.oms.entity.*;
 import org.junit.jupiter.api.Test;
 
@@ -44,6 +48,10 @@ class DtoCoverageTest {
         resp.setResults(Arrays.asList(result));
         assertEquals(1L, resp.getOrderId());
         assertEquals(1, resp.getResults().size());
+
+        NotificationDispatchResponseDto respNull = new NotificationDispatchResponseDto(2L, null);
+        assertEquals(2L, respNull.getOrderId());
+        assertNotNull(respNull.getResults());
     }
 
     @Test
@@ -57,6 +65,25 @@ class DtoCoverageTest {
         details.setCreatedAt(Instant.now());
         details.setUpdatedAt(Instant.now());
         assertEquals("ORD", details.getOrderNumber());
+
+        OrderDetailsDto sixArg = new OrderDetailsDto(1L, 2L, "ORD-2",
+                new BigDecimal("5.00"), Instant.now(), Instant.now());
+        assertEquals("ORD-2", sixArg.getOrderNumber());
+        assertEquals(1L, sixArg.getId());
+        assertEquals(2L, sixArg.getCustomerId());
+        assertEquals(new BigDecimal("5.00"), sixArg.getTotalAmount());
+        assertNotNull(sixArg.getCreatedAt());
+        assertNotNull(sixArg.getUpdatedAt());
+        assertNull(sixArg.getOrderStatus());
+
+        OrderDetailsDto sevenArg = new OrderDetailsDto(1L, 2L, "ORD-3",
+                new BigDecimal("5.00"), Instant.now(), Instant.now(), new CompletedOrder());
+        assertNotNull(sevenArg.getOrderStatus());
+
+        assertNotNull(new NewOrder());
+        assertNotNull(new ProcessingOrder());
+        assertNotNull(new CompletedOrder());
+        assertNotNull(new CancelledOrder());
 
         PaymentSummaryDto p = new PaymentSummaryDto();
         p.setPendingCount(1);
@@ -95,6 +122,78 @@ class DtoCoverageTest {
         dash.setErrors(Arrays.asList("e1"));
         assertEquals(1, dash.getErrors().size());
         assertEquals(AuditEventType.ORDER_DASHBOARD_AGGREGATED, dash.getAuditTimeline().get(0).getEventType());
+
+        OrderDashboardDto dashNull = new OrderDashboardDto(null, null, null, null, null, null);
+        assertNotNull(dashNull.getAuditTimeline());
+        assertNotNull(dashNull.getErrors());
+    }
+
+    @Test
+    void productDtoSettersCoverage() {
+        ProductDto dto = new ProductDto();
+        dto.setId(1L);
+        dto.setSku("SKU");
+        dto.setName("Name");
+        dto.setDescription("Desc");
+        dto.setBasePrice(new BigDecimal("10.00"));
+        dto.setStatus(ProductStatus.ACTIVE);
+        assertEquals(1L, dto.getId());
+        assertEquals("SKU", dto.getSku());
+        assertEquals("Name", dto.getName());
+        assertEquals("Desc", dto.getDescription());
+        assertEquals(new BigDecimal("10.00"), dto.getBasePrice());
+        assertEquals(ProductStatus.ACTIVE, dto.getStatus());
+    }
+
+    @Test
+    void inventoryItemDtoSettersCoverage() {
+        InventoryItemDto dto = new InventoryItemDto();
+        dto.setId(1L);
+        dto.setSku("SKU");
+        dto.setQuantity(5);
+        dto.setStatus(InventoryStatus.AVAILABLE);
+        assertEquals(1L, dto.getId());
+        assertEquals("SKU", dto.getSku());
+        assertEquals(5, dto.getQuantity());
+        assertEquals(InventoryStatus.AVAILABLE, dto.getStatus());
+    }
+
+    @Test
+    void shipmentSummaryDtoSettersCoverage() {
+        Instant now = Instant.now();
+        ShipmentSummaryDto dto = new ShipmentSummaryDto(ShipmentStatus.SHIPPED, "C", "T", now);
+        assertEquals(ShipmentStatus.SHIPPED, dto.getStatus());
+        assertEquals("T", dto.getTrackingRef());
+        assertEquals(now, dto.getCreatedAt());
+    }
+
+    @Test
+    void auditTimelineItemDtoConstructorCoverage() {
+        Instant now = Instant.now();
+        AuditTimelineItemDto dto = new AuditTimelineItemDto(
+                AuditEventType.ORDER_DASHBOARD_AGGREGATED, "msg", now);
+        assertEquals(AuditEventType.ORDER_DASHBOARD_AGGREGATED, dto.getEventType());
+        assertEquals("msg", dto.getMessage());
+        assertEquals(now, dto.getCreatedAt());
+    }
+
+    @Test
+    void apiErrorCoverage() {
+        ApiError err = new ApiError();
+        Instant now = Instant.now();
+        err.setTimestamp(now);
+        err.setStatus(404);
+        err.setError("NOT_FOUND");
+        err.setMessage("not found");
+        err.setPath("/test");
+        assertEquals(now, err.getTimestamp());
+        assertEquals(404, err.getStatus());
+        assertEquals("NOT_FOUND", err.getError());
+        assertEquals("not found", err.getMessage());
+        assertEquals("/test", err.getPath());
+
+        ApiError full = new ApiError(now, 500, "ERROR", "msg", "/api");
+        assertEquals(500, full.getStatus());
     }
 
     @Test

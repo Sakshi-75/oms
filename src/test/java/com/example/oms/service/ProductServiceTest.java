@@ -61,6 +61,11 @@ class ProductServiceTest {
                         new BigDecimal("20.00"), ProductStatus.DISCONTINUED));
         assertEquals("Name2", updated.getName());
 
+        ProductDto updatedNullStatus = service.update(1L,
+                new ProductDto(null, "SKU", "Name3", "D3",
+                        new BigDecimal("30.00"), null));
+        assertEquals("Name3", updatedNullStatus.getName());
+
         ProductDto disc = service.discontinue(1L);
         assertEquals(ProductStatus.DISCONTINUED, disc.getStatus());
     }

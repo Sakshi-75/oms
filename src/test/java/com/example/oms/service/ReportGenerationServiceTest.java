@@ -464,12 +464,12 @@ class ReportGenerationServiceTest {
         Future<?> execFail = new Future<Object>() {
             @Override
             public Object get() throws InterruptedException, ExecutionException {
-                throw new ExecutionException(new RuntimeException("x"));
+                throw new ExecutionException(null);
             }
 
             @Override
             public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException {
-                throw new ExecutionException(new RuntimeException("x"));
+                throw new ExecutionException(null);
             }
 
             @Override

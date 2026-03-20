@@ -18,6 +18,29 @@ class OrderDashboardMapperTest {
     @Test
     void toOrderDetailsNullHandling() {
         assertNull(OrderDashboardMapper.toOrderDetails(null));
+
+        Order nullStatus = new Order();
+        nullStatus.setId(1L);
+        nullStatus.setOrderNumber("ORD-1");
+        OrderDetailsDto dto = OrderDashboardMapper.toOrderDetails(nullStatus);
+        assertNotNull(dto);
+        assertNull(dto.getOrderStatus());
+
+        Order newOrder = new Order();
+        newOrder.setStatus(OrderStatus.NEW);
+        assertNotNull(OrderDashboardMapper.toOrderDetails(newOrder).getOrderStatus());
+
+        Order processing = new Order();
+        processing.setStatus(OrderStatus.PROCESSING);
+        assertNotNull(OrderDashboardMapper.toOrderDetails(processing).getOrderStatus());
+
+        Order completed = new Order();
+        completed.setStatus(OrderStatus.COMPLETED);
+        assertNotNull(OrderDashboardMapper.toOrderDetails(completed).getOrderStatus());
+
+        Order cancelled = new Order();
+        cancelled.setStatus(OrderStatus.CANCELLED);
+        assertNotNull(OrderDashboardMapper.toOrderDetails(cancelled).getOrderStatus());
     }
 
     @Test
@@ -41,6 +64,10 @@ class OrderDashboardMapperTest {
     void shipmentSummaryReturnsNullForEmpty() {
         assertNull(OrderDashboardMapper.toShipmentSummary(Collections.<Shipment>emptyList()));
         assertNull(OrderDashboardMapper.toShipmentSummary(null));
+
+        List<Shipment> allNulls = new ArrayList<Shipment>();
+        allNulls.add(null);
+        assertNull(OrderDashboardMapper.toShipmentSummary(allNulls));
     }
 
     @Test
@@ -62,6 +89,7 @@ class OrderDashboardMapperTest {
                 new Notification(1L, 1L, NotificationType.EMAIL, "m1", Instant.now(), true),
                 new Notification(2L, 1L, NotificationType.SMS, "m2", Instant.now(), false),
                 new Notification(3L, 1L, NotificationType.PUSH, "m3", Instant.now(), true),
+                new Notification(4L, 1L, null, "m4", Instant.now(), false),
                 null
         );
         NotificationSummaryDto dto = OrderDashboardMapper.toNotificationSummary(notifications);
@@ -69,7 +97,10 @@ class OrderDashboardMapperTest {
         assertEquals(1, dto.getSmsCount());
         assertEquals(1, dto.getPushCount());
         assertEquals(2, dto.getSuccessCount());
-        assertEquals(1, dto.getFailureCount());
+        assertEquals(2, dto.getFailureCount());
+
+        NotificationSummaryDto nullDto = OrderDashboardMapper.toNotificationSummary(null);
+        assertEquals(0, nullDto.getEmailCount());
     }
 
     @Test

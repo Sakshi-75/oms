@@ -47,5 +47,33 @@ class InventoryItemMapperTest {
         assertEquals(record.quantity(), item.getQuantity());
         assertEquals(record.status(), item.getStatus());
     }
+
+    @Test
+    void toEntityRecordNullStatusPositiveQuantity() {
+        InventoryItemRecord record = new InventoryItemRecord(1L, "SKU", 5, null);
+        InventoryItem item = InventoryItemMapper.toEntity(record);
+        assertEquals(InventoryStatus.AVAILABLE, item.getStatus());
+    }
+
+    @Test
+    void toEntityRecordNullStatusZeroQuantity() {
+        InventoryItemRecord record = new InventoryItemRecord(1L, "SKU", 0, null);
+        InventoryItem item = InventoryItemMapper.toEntity(record);
+        assertEquals(InventoryStatus.OUT_OF_STOCK, item.getStatus());
+    }
+
+    @Test
+    void toEntityDtoNullStatusPositiveQuantity() {
+        InventoryItemDto dto = new InventoryItemDto(1L, "SKU", 5, null);
+        InventoryItem item = InventoryItemMapper.toEntity(dto);
+        assertEquals(InventoryStatus.AVAILABLE, item.getStatus());
+    }
+
+    @Test
+    void toEntityDtoNullStatusZeroQuantity() {
+        InventoryItemDto dto = new InventoryItemDto(1L, "SKU", 0, null);
+        InventoryItem item = InventoryItemMapper.toEntity(dto);
+        assertEquals(InventoryStatus.OUT_OF_STOCK, item.getStatus());
+    }
 }
 

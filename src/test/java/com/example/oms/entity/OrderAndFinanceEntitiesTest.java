@@ -42,6 +42,18 @@ class OrderAndFinanceEntitiesTest {
         assertEquals(OrderStatus.NEW, order.getStatus());
         assertEquals(1, order.getItems().size());
         assertEquals(new BigDecimal("10.00"), order.getTotalAmount());
+
+        Instant now = Instant.now();
+        Order full = new Order(1L, 2L, "ORD-2", OrderStatus.PROCESSING,
+                Arrays.asList(new OrderItem("P", "N", 1, BigDecimal.ONE)),
+                new BigDecimal("1.00"), now, now);
+        assertEquals(2L, full.getCustomerId());
+        assertEquals(now, full.getCreatedAt());
+        assertEquals(now, full.getUpdatedAt());
+
+        Order nullItems = new Order(2L, 3L, "ORD-3", OrderStatus.NEW,
+                null, BigDecimal.ZERO, now, now);
+        assertNotNull(nullItems.getItems());
     }
 
     @Test
@@ -56,6 +68,14 @@ class OrderAndFinanceEntitiesTest {
         p.setCreatedAt(Instant.now());
         assertEquals("TX", p.getTransactionRef());
         assertEquals(PaymentStatus.SUCCESS, p.getStatus());
+
+        Instant now = Instant.now();
+        Payment full = new Payment(1L, 2L, new BigDecimal("5.00"), PaymentStatus.FAILED,
+                PaymentMethod.CASH, "TX2", now);
+        assertEquals(1L, full.getId());
+        assertEquals(2L, full.getOrderId());
+        assertEquals(PaymentMethod.CASH, full.getPaymentMethod());
+        assertEquals(now, full.getCreatedAt());
     }
 
     @Test
@@ -69,6 +89,13 @@ class OrderAndFinanceEntitiesTest {
         s.setCreatedAt(Instant.now());
         assertEquals("C", s.getCarrier());
         assertEquals(ShipmentStatus.SHIPPED, s.getStatus());
+
+        Instant now = Instant.now();
+        Shipment full = new Shipment(1L, 2L, ShipmentStatus.DELIVERED, "C2", "T2", now);
+        assertEquals(1L, full.getId());
+        assertEquals(2L, full.getOrderId());
+        assertEquals("T2", full.getTrackingRef());
+        assertEquals(now, full.getCreatedAt());
     }
 
     @Test
@@ -82,6 +109,13 @@ class OrderAndFinanceEntitiesTest {
         n.setSuccess(false);
         assertEquals(false, n.isSuccess());
         assertEquals(NotificationType.SMS, n.getType());
+
+        Instant now = Instant.now();
+        Notification full = new Notification(1L, 2L, NotificationType.EMAIL, "msg", now, true);
+        assertEquals(1L, full.getId());
+        assertEquals(2L, full.getOrderId());
+        assertEquals("msg", full.getMessage());
+        assertEquals(now, full.getSentAt());
     }
 
     @Test
@@ -93,6 +127,13 @@ class OrderAndFinanceEntitiesTest {
         a.setMessage("m");
         a.setCreatedAt(Instant.now());
         assertEquals(AuditEventType.ORDER_NOTIFICATION_DISPATCHED, a.getEventType());
+
+        Instant now = Instant.now();
+        AuditTrail full = new AuditTrail(1L, 2L, AuditEventType.DAILY_ORDERS_REPORT_GENERATED, "msg", now);
+        assertEquals(1L, full.getId());
+        assertEquals(2L, full.getOrderId());
+        assertEquals("msg", full.getMessage());
+        assertEquals(now, full.getCreatedAt());
     }
 
     @Test
@@ -106,6 +147,16 @@ class OrderAndFinanceEntitiesTest {
         d.setGeneratedAt(Instant.now());
         assertEquals(10, d.getRowCount());
         assertEquals(ReportGenerationStatus.SUCCESS, d.getStatus());
+
+        Instant now = Instant.now();
+        DailyOrdersReportGeneration full = new DailyOrdersReportGeneration(
+                1L, LocalDate.of(2026, 1, 1), "report.csv", 5,
+                ReportGenerationStatus.PARTIAL_FAILURE, now);
+        assertEquals("report.csv", full.getFileName());
+        assertEquals(5, full.getRowCount());
+        assertEquals(LocalDate.of(2026, 1, 1), full.getReportDate());
+        assertEquals(now, full.getGeneratedAt());
+        assertEquals(1L, full.getId());
     }
 }
 

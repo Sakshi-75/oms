@@ -38,6 +38,12 @@ class InventoryServiceTest {
         InventoryItemRecord updated = service.createOrUpdate(new InventoryItemRecord(null, "SKU", 0, null));
         assertEquals(0, updated.quantity());
         assertEquals(InventoryStatus.OUT_OF_STOCK, updated.status());
+
+        InventoryItem existing2 = new InventoryItem(2L, "SKU2", 1, InventoryStatus.OUT_OF_STOCK);
+        when(repo.findBySku("SKU2")).thenReturn(Optional.of(existing2));
+        InventoryItemRecord updated2 = service.createOrUpdate(new InventoryItemRecord(null, "SKU2", 10, null));
+        assertEquals(10, updated2.quantity());
+        assertEquals(InventoryStatus.AVAILABLE, updated2.status());
     }
 
     @Test
@@ -52,6 +58,10 @@ class InventoryServiceTest {
         when(repo.save(any(InventoryItem.class))).thenAnswer(i -> i.getArgument(0));
         service.reserve("SKU2", 5);
         assertEquals(5, item.getQuantity());
+
+        service.reserve("SKU2", 5);
+        assertEquals(0, item.getQuantity());
+        assertEquals(InventoryStatus.OUT_OF_STOCK, item.getStatus());
 
         assertThrows(BusinessException.class, () -> service.reserve("SKU2", 0));
         assertThrows(BusinessException.class, () -> service.reserve("SKU2", 100));

@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
 class RequestCorrelationFilterTest {
@@ -41,6 +42,27 @@ class RequestCorrelationFilterTest {
 
         verify(chain, times(1)).doFilter(request, response);
         assertNull(CorrelationIdHolder.get());
+    }
+
+    @Test
+    void emptyCorrelationIdGeneratesNew() throws IOException, ServletException {
+        RequestCorrelationFilter filter = new RequestCorrelationFilter();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getHeader("X-Correlation-Id")).thenReturn("  ");
+        ServletResponse response = mock(ServletResponse.class);
+        FilterChain chain = mock(FilterChain.class);
+
+        filter.doFilter(request, response, chain);
+
+        verify(chain, times(1)).doFilter(request, response);
+        assertNull(CorrelationIdHolder.get());
+    }
+
+    @Test
+    void initAndDestroy() {
+        RequestCorrelationFilter filter = new RequestCorrelationFilter();
+        assertDoesNotThrow(() -> filter.init(null));
+        assertDoesNotThrow(() -> filter.destroy());
     }
 }
 

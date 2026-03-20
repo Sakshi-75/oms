@@ -110,7 +110,7 @@ public class ReportGenerationService {
         if (rowCount <= 0) {
             return ReportGenerationStatus.EMPTY;
         }
-        if (errors != null && !errors.isEmpty()) {
+        if (!errors.isEmpty()) {
             return ReportGenerationStatus.PARTIAL_FAILURE;
         }
         return ReportGenerationStatus.SUCCESS;

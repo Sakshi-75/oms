@@ -167,13 +167,11 @@ class NotificationDispatchServiceTest {
 
         @Override
         public T get() throws InterruptedException, ExecutionException {
-            if (ex instanceof InterruptedException) {
-                throw (InterruptedException) ex;
+            switch (ex) {
+                case InterruptedException ie -> throw ie;
+                case ExecutionException ee -> throw ee;
+                default -> throw new ExecutionException(ex);
             }
-            if (ex instanceof ExecutionException) {
-                throw (ExecutionException) ex;
-            }
-            throw new ExecutionException(ex);
         }
 
         @Override

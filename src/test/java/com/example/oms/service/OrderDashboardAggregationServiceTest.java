@@ -72,11 +72,11 @@ class OrderDashboardAggregationServiceTest {
 
         // Include null and null createdAt to cover comparator branches.
         List<AuditTrail> audits = new ArrayList<AuditTrail>();
-        audits.add(new AuditTrail(1L, 1L, AuditEventType.ORDER_NOTIFICATION_DISPATCHED, "A1", null));
-        audits.add(new AuditTrail(4L, 1L, AuditEventType.ORDER_DASHBOARD_AGGREGATED, "A1b", null));
-        audits.add(null);
         audits.add(new AuditTrail(2L, 1L, AuditEventType.ORDER_DASHBOARD_AGGREGATED, "A2", t2));
+        audits.add(new AuditTrail(1L, 1L, AuditEventType.ORDER_NOTIFICATION_DISPATCHED, "A1", null));
+        audits.add(null);
         audits.add(new AuditTrail(3L, 1L, AuditEventType.DAILY_ORDERS_REPORT_GENERATED, "A3", t3));
+        audits.add(new AuditTrail(4L, 1L, AuditEventType.ORDER_DASHBOARD_AGGREGATED, "A1b", null));
         when(auditTrailRepository.findByOrderId(1L)).thenReturn(audits);
 
         executorToShutdown = Executors.newFixedThreadPool(5);
@@ -890,6 +890,28 @@ class OrderDashboardAggregationServiceTest {
         );
 
         assertThrows(NotFoundException.class, () -> service.getDashboard(8L));
+    }
+
+    @Test
+    void safeGetOrderExecutionExceptionNullCause() {
+        OrderRepository orderRepository = mock(OrderRepository.class);
+        PaymentRepository paymentRepository = mock(PaymentRepository.class);
+        ShipmentRepository shipmentRepository = mock(ShipmentRepository.class);
+        NotificationRepository notificationRepository = mock(NotificationRepository.class);
+        AuditTrailRepository auditTrailRepository = mock(AuditTrailRepository.class);
+
+        Future<OrderDetailsDto> orderFuture = new ExecutionExceptionFuture<OrderDetailsDto>(new ExecutionException(null));
+        Future<PaymentSummaryDto> paymentFuture = CompletableFuture.completedFuture(new PaymentSummaryDto());
+        Future<ShipmentSummaryDto> shipmentFuture = CompletableFuture.completedFuture(new ShipmentSummaryDto());
+        Future<NotificationSummaryDto> notificationFuture = CompletableFuture.completedFuture(new NotificationSummaryDto());
+        Future<List<AuditTimelineItemDto>> auditFuture = CompletableFuture.completedFuture(Collections.emptyList());
+
+        ExecutorService stubExecutor = new StubExecutorService(orderFuture, paymentFuture, shipmentFuture, notificationFuture, auditFuture);
+        OrderDashboardAggregationService service = new OrderDashboardAggregationService(
+                orderRepository, paymentRepository, shipmentRepository,
+                notificationRepository, auditTrailRepository, stubExecutor);
+
+        assertThrows(NotFoundException.class, () -> service.getDashboard(9L));
     }
 }
 

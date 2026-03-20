@@ -25,7 +25,6 @@ public class OrderDashboardMapper {
                 case PROCESSING -> new ProcessingOrder();
                 case COMPLETED -> new CompletedOrder();
                 case CANCELLED -> new CancelledOrder();
-                default -> null;
             };
         }
         return new OrderDetailsDto(

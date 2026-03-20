@@ -26,6 +26,11 @@ class ProductMapperTest {
     void nullHandling() {
         assertNull(ProductMapper.toDto(null));
         assertNull(ProductMapper.toEntity(null));
+
+        ProductDto nullStatus = new ProductDto(1L, "SKU", "Name", "Desc",
+                new BigDecimal("10.00"), null);
+        Product entity = ProductMapper.toEntity(nullStatus);
+        assertEquals(ProductStatus.ACTIVE, entity.getStatus());
     }
 }
 

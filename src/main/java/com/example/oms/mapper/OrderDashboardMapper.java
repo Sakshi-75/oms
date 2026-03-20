@@ -1,6 +1,8 @@
 package com.example.oms.mapper;
 
 import com.example.oms.dto.*;
+import com.example.oms.dto.status.*;
+import com.example.oms.dto.status.OrderStatus;
 import com.example.oms.entity.*;
 
 import java.math.BigDecimal;
@@ -16,14 +18,24 @@ public class OrderDashboardMapper {
         if (order == null) {
             return null;
         }
+        OrderStatus orderStatus = null;
+        if (order.getStatus() != null) {
+            orderStatus = switch (order.getStatus()) {
+                case NEW -> new NewOrder();
+                case PROCESSING -> new ProcessingOrder();
+                case COMPLETED -> new CompletedOrder();
+                case CANCELLED -> new CancelledOrder();
+                default -> null;
+            };
+        }
         return new OrderDetailsDto(
                 order.getId(),
                 order.getCustomerId(),
                 order.getOrderNumber(),
-                order.getStatus(),
                 order.getTotalAmount(),
                 order.getCreatedAt(),
-                order.getUpdatedAt()
+                order.getUpdatedAt(),
+                orderStatus
         );
     }
 

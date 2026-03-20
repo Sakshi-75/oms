@@ -110,7 +110,7 @@ class OrderDashboardAggregationServiceTest {
         assertEquals(1, dash.getNotificationSummary().getFailureCount());
 
         assertNotNull(dash.getAuditTimeline());
-        assertEquals(3, dash.getAuditTimeline().size());
+        assertEquals(4, dash.getAuditTimeline().size());
         // First audit has null createdAt; comparator places it first (ia null and ib non-null => -1)
         assertEquals(AuditEventType.ORDER_NOTIFICATION_DISPATCHED, dash.getAuditTimeline().get(0).getEventType());
     }

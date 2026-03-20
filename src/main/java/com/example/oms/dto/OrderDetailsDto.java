@@ -1,19 +1,18 @@
 package com.example.oms.dto;
 
-import com.example.oms.entity.OrderStatus;
-
 import java.math.BigDecimal;
 import java.time.Instant;
+import com.example.oms.dto.status.OrderStatus;
 
 public class OrderDetailsDto {
 
     private Long id;
     private Long customerId;
     private String orderNumber;
-    private OrderStatus status;
     private BigDecimal totalAmount;
     private Instant createdAt;
     private Instant updatedAt;
+    private com.example.oms.dto.status.OrderStatus orderStatus;
 
     public OrderDetailsDto() {
     }
@@ -21,17 +20,31 @@ public class OrderDetailsDto {
     public OrderDetailsDto(Long id,
                              Long customerId,
                              String orderNumber,
-                             OrderStatus status,
                              BigDecimal totalAmount,
                              Instant createdAt,
                              Instant updatedAt) {
         this.id = id;
         this.customerId = customerId;
         this.orderNumber = orderNumber;
-        this.status = status;
         this.totalAmount = totalAmount;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public OrderDetailsDto(Long id,
+                           Long customerId,
+                           String orderNumber,
+                           BigDecimal totalAmount,
+                           Instant createdAt,
+                           Instant updatedAt,
+                           com.example.oms.dto.status.OrderStatus orderStatus) {
+        this.id = id;
+        this.customerId = customerId;
+        this.orderNumber = orderNumber;
+        this.totalAmount = totalAmount;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.orderStatus = orderStatus;
     }
 
     public Long getId() {
@@ -58,14 +71,6 @@ public class OrderDetailsDto {
         this.orderNumber = orderNumber;
     }
 
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(OrderStatus status) {
-        this.status = status;
-    }
-
     public BigDecimal getTotalAmount() {
         return totalAmount;
     }
@@ -88,6 +93,14 @@ public class OrderDetailsDto {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public OrderStatus getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
     }
 }
 

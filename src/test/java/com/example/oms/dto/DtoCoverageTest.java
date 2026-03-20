@@ -1,5 +1,6 @@
 package com.example.oms.dto;
 
+import com.example.oms.dto.status.NewOrder;
 import com.example.oms.entity.*;
 import org.junit.jupiter.api.Test;
 
@@ -51,7 +52,7 @@ class DtoCoverageTest {
         details.setId(1L);
         details.setCustomerId(2L);
         details.setOrderNumber("ORD");
-        details.setStatus(OrderStatus.NEW);
+        details.setOrderStatus(new NewOrder());
         details.setTotalAmount(new BigDecimal("10.00"));
         details.setCreatedAt(Instant.now());
         details.setUpdatedAt(Instant.now());
